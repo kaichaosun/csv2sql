@@ -13,7 +13,7 @@ fn main() {
     println!("csv: {:?}", csv_content);
 
     let generated_sql = generate_sql(&csv_content);
-    println!("sql: {:?}", generated_sql);
+    println!("sql: {}", generated_sql);
 }
 
 // Define your own header here
@@ -32,7 +32,7 @@ fn read_csv(file_path: &str) -> Result<(Header, Vec<Data>), &'static str> {
     let header = Header(
         "title".to_string(),
         "publish_date".to_string(),
-        "reader_num".to_string(),
+        "read_num".to_string(),
         "like_num".to_string(),
         "comment_num".to_string(),
         "collection_num".to_string(),
@@ -60,14 +60,10 @@ fn read_csv(file_path: &str) -> Result<(Header, Vec<Data>), &'static str> {
     Ok((header, all_data))
 }
 
-// INSERT INTO wechat_follower (followers_count, record_date, account_name)
-// VALUES
-// 	(985, '2020-02-22 21:53:14', 'Polkadot中文平台');
-	
 fn generate_sql(csv_data: &(Header, Vec<Data>)) -> String {
     let (header, data) = csv_data;
     let base_sql = format!(
-        "INSERT INTO wechat_follower ( {}, {}, {}, {}, {}, {}, {}, {} ) VALUES ",
+        "INSERT INTO zhihu_articles_performance ( {}, {}, {}, {}, {}, {}, {}, {} ) VALUES ",
         header.0,
         header.1,
         header.2,
@@ -81,7 +77,7 @@ fn generate_sql(csv_data: &(Header, Vec<Data>)) -> String {
     let mut values_sql = "".to_string();
     for item in data.iter() {
         let value_part = format!(
-            "( {}, {}, {}, {}, {}, {}, {}, {} ),",
+            "( '{}', '{}', {}, {}, {}, {}, '{}', '{}' ),",
             item.0,
             item.1,
             item.2,
@@ -94,5 +90,7 @@ fn generate_sql(csv_data: &(Header, Vec<Data>)) -> String {
         values_sql.push_str(&value_part);
     }
 
-    format!("{}{}", base_sql, values_sql)
+    let s = format!("{}{}", base_sql, values_sql);
+    let len = s.len();
+    s[0..len-1].to_string()
 }
