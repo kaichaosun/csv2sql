@@ -7,9 +7,10 @@
 
 
 use csv::Reader;
+use std::env;
 fn main() {
-    let file_path = "./zhihu_articles.csv";
-    let csv_content = read_csv(file_path).unwrap();
+    let file_path = format!("./{}", env::var("CSV_PATH").unwrap());
+    let csv_content = read_csv(&file_path).unwrap();
     println!("csv: {:?}", csv_content);
 
     let generated_sql = generate_sql(&csv_content);
